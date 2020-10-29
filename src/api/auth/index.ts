@@ -87,4 +87,8 @@ export default (app) => {
     `/auth/custom-signup`,
     require('./custom_SignUp').default,
   );
+  app.post(
+    `/auth/custom-sigin`,
+    require('./custom_SignIn').default,
+  );
 };
