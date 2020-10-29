@@ -1,0 +1,30 @@
+export default (app) => {
+  app.post(
+    `/tenant/:tenantId/orders`,
+    require('./ordersCreate').default,
+  );
+  app.put(
+    `/tenant/:tenantId/orders/:id`,
+    require('./ordersUpdate').default,
+  );
+  app.post(
+    `/tenant/:tenantId/orders/import`,
+    require('./ordersImport').default,
+  );
+  app.delete(
+    `/tenant/:tenantId/orders`,
+    require('./ordersDestroy').default,
+  );
+  app.get(
+    `/tenant/:tenantId/orders/autocomplete`,
+    require('./ordersAutocomplete').default,
+  );
+  app.get(
+    `/tenant/:tenantId/orders`,
+    require('./ordersList').default,
+  );
+  app.get(
+    `/tenant/:tenantId/orders/:id`,
+    require('./ordersFind').default,
+  );
+};
