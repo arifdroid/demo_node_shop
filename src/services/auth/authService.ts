@@ -186,7 +186,7 @@ class AuthService {
     const transaction = await SequelizeRepository.createTransaction(options.database);
 
     try {
-      const { fullName, email, phoneNumber, pwd , address} = data;
+      const { fullName, email, phoneNumber, pwd, address } = data;
 
       const existingUser = await UserRepository.findByPhone(phoneNumber,
         options
@@ -203,24 +203,63 @@ class AuthService {
 
       } else { //signup new user
 
-        let password = hashed_password;
-        let data = { fullName, email, phoneNumber, password, address }
+        const check_if_admin = await UserRepository.checkTable(options);
 
-        const user = await UserRepository.create(data, {
-          ...options, transaction
-        });
+        console.log('check if admin return', check_if_admin)
 
-        const token = jwt.sign(
-          { id: `${user.id}_${user.phone}` },
-          getConfig().AUTH_JWT_SECRET,
-          { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
-        );
+        if (check_if_admin.length>0) {
+          console.log('check if admin return 1')
 
-        await SequelizeRepository.commitTransaction(
-          transaction,
-        );
+          let password = hashed_password;
+          let data = { fullName, email, phoneNumber, password, address }
 
-        return { token, user }
+          const user = await UserRepository.create(data, {
+            ...options, transaction
+          });
+
+          const token = jwt.sign(
+            { id: `${user.id}_${user.phone}` },
+            getConfig().AUTH_JWT_SECRET,
+            { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
+          );
+
+          await SequelizeRepository.commitTransaction(
+            transaction,
+          );
+
+          return { token, user }
+
+        } else {
+
+          console.log('check if admin return 2')
+
+
+          //create tenant then create admin user
+
+          await TenantRepository.create(data,options);
+
+          let password = hashed_password;
+          let data_2 = { fullName, email, phoneNumber, password, address }
+
+          const user = await UserRepository.create(data_2, {
+            ...options, transaction
+          });
+
+          const token = jwt.sign(
+            { id: `${user.id}_${user.phone}` },
+            getConfig().AUTH_JWT_SECRET,
+            { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
+          );
+
+          await SequelizeRepository.commitTransaction(
+            transaction,
+          );
+
+          return { token, user }
+          
+
+
+        }
       }
 
 
@@ -244,53 +283,53 @@ class AuthService {
 
     try {
 
-        const user = await UserRepository.findByPhone(phoneNumber, options);
+      const user = await UserRepository.findByPhone(phoneNumber, options);
 
-        if (!user) throw new Error400('user not found');
+      if (!user) throw new Error400('user not found');
 
-        const currentPassword = await UserRepository.findPassword(user.id, options);
+      const currentPassword = await UserRepository.findPassword(user.id, options);
 
-        if (!currentPassword) {
-          throw new Error400(
-            options.language,
-            'is this the correct username and password?',
-          );
-          // throw new Error400('is this the correct username and password?');
-        }
-
-
-        const passwordMatch = await bcrypt.compare(pwd, currentPassword);
-
-        if (!passwordMatch) {
-          throw new Error400(
-            options.language,
-            'is this the correct username and password?',
-          );
-          // throw new Error400('is this the correct username and password?');
-        }
-
-        const token = jwt.sign(
-            { id: `${user.id}_${user.phone}` },
-            getConfig().AUTH_JWT_SECRET,
-            { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
+      if (!currentPassword) {
+        throw new Error400(
+          options.language,
+          'is this the correct username and password?',
         );
+        // throw new Error400('is this the correct username and password?');
+      }
 
-        await SequelizeRepository.commitTransaction(
-            transaction,
+
+      const passwordMatch = await bcrypt.compare(pwd, currentPassword);
+
+      if (!passwordMatch) {
+        throw new Error400(
+          options.language,
+          'is this the correct username and password?',
         );
+        // throw new Error400('is this the correct username and password?');
+      }
 
-        return {token,user};
+      const token = jwt.sign(
+        { id: `${user.id}_${user.phone}` },
+        getConfig().AUTH_JWT_SECRET,
+        { expiresIn: getConfig().AUTH_JWT_EXPIRES_IN },
+      );
+
+      await SequelizeRepository.commitTransaction(
+        transaction,
+      );
+
+      return { token, user };
 
     } catch (error) {
 
-        await SequelizeRepository.rollbackTransaction(
-            transaction,
-        );
+      await SequelizeRepository.rollbackTransaction(
+        transaction,
+      );
 
-        throw error;
+      throw error;
 
     }
-}
+  }
 
   /**
    * Finds the user by the email.

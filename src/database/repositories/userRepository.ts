@@ -32,9 +32,10 @@ export default class UserRepository {
       {
         id: data.id || undefined,
         email: data.email,
-        firstName: data.firstName || null,
-        lastName: data.lastName || null,
+        fullName:data.fullName,
         phoneNumber: data.phoneNumber || null,
+        password:data.password,
+        address:data.address,
         importHash: data.importHash || null,
         createdById: currentUser.id,
         updatedById: currentUser.id,
@@ -69,6 +70,11 @@ export default class UserRepository {
       ...options,
       bypassPermissionValidation: true,
     });
+  }
+
+  static async checkTable(options){
+
+    return await options.database.user.findAll();
   }
 
   /**

@@ -37,6 +37,7 @@ class TenantRepository {
     // in case of multi tenant without subdomain
     // set a random uuid
     data.url = data.url || uuid();
+    data.name = 'test_tenant'
 
     const existsUrl = Boolean(
       await options.database.tenant.count({
@@ -58,7 +59,7 @@ class TenantRepository {
     const record = await options.database.tenant.create(
       {
         ...lodash.pick(data, [
-          'id',
+          // 'id',
           'name',
           'url',
           'importHash',

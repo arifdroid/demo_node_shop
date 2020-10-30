@@ -13,6 +13,11 @@ const basename = path.basename(module.filename);
 function models() {
   const database = {} as any;
 
+  console.log('\n\n======')
+
+  console.log('db is', getConfig().DATABASE_DATABASE)
+  console.log('\n======\n\n')
+
   let sequelize = new (<any>Sequelize)(
     getConfig().DATABASE_DATABASE,
     getConfig().DATABASE_USERNAME,

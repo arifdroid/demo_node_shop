@@ -47,12 +47,46 @@ class OrdersRepository {
       },
     );
 
-    await record.setUserId(data.userId || null, {
+    await record.setUserId(currentUser.id || null, {
       transaction,
     });
-    await record.setOrderId(data.orderId || [], {
-      transaction,
-    });
+    // await record.setOrderId(data.orderId || [], {
+    //   transaction,
+    // });
+
+    // await record.setProductId(data.productId || null,{
+    //   transaction
+    // })
+
+    // await options.database.orders_products.create({
+    //   ...lodash.pick(data,[
+    //     'productId',
+    //     'quantity_ordered',
+    //     'total_price'
+    //   ]),
+    //     orderId:record.id
+        
+    // },{transaction})
+
+    let insert_order_id :any = [];
+
+    let record_id = record.id
+
+    data.order_array.forEach((el: any)=>{
+
+      insert_order_id.push({...el, orderId:record_id})
+
+    })
+
+    console.log('\n\n========\n')
+    console.log('data to order is', insert_order_id)
+    console.log('\n========\n\n')
+
+
+    await options.database.orders_products.bulkCreate(
+      insert_order_id
+        
+    ,{transaction})
   
 
   
@@ -104,6 +138,7 @@ class OrdersRepository {
         ...lodash.pick(data, [
           
           'importHash',
+          'status'
         ]),
         updatedById: currentUser.id,
       },
@@ -112,13 +147,14 @@ class OrdersRepository {
       },
     );
 
-    await record.setUserId(data.userId || null, {
-      transaction,
-    });
-    await record.setOrderId(data.orderId || [], {
-      transaction,
-    });
+    // await record.setUserId(data.userId || null, {
+    //   transaction,
+    // });
+    // await record.setOrderId(data.orderId || [], {
+    //   transaction,
+    // });
 
+    //after update, go to order product list, reduce quantity number
 
 
     await this._createAuditLog(
@@ -458,9 +494,9 @@ class OrdersRepository {
       options,
     );
 
-    output.orderId = await record.getOrderId({
-      transaction,
-    });
+    // output.orderId = await record.getOrderId({
+    //   transaction,
+    // });
 
     return output;
   }
