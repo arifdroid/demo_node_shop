@@ -9,6 +9,11 @@ export default function (sequelize) {
     'orders_products',
     {
       
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
       quantity_ordered: {
         type: DataTypes.INTEGER,
         allowNull: false,

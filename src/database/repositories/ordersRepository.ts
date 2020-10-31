@@ -3,7 +3,7 @@ import AuditLogRepository from '../../database/repositories/auditLogRepository';
 import lodash from 'lodash';
 import SequelizeFilterUtils from '../../database/utils/sequelizeFilterUtils';
 import Error404 from '../../errors/Error404';
-import Sequelize from 'sequelize';
+import Sequelize, { DataTypes } from 'sequelize';
 import { IRepositoryOptions } from './IRepositoryOptions';
 
 const Op = Sequelize.Op;
@@ -146,6 +146,27 @@ class OrdersRepository {
         transaction,
       },
     );
+
+    if(record.status == 'close'){
+      
+      let where = {orderId : id}
+
+      let data_2 = await options.database.orders_products.findAll({
+        where,
+        raw:true
+      })
+
+      data_2.forEach(async (el)=>{
+
+        let record_product = await options.database.products.findByPk(el.productId)
+         await record_product.update({
+          quantity:(record_product.quantity - el.quantity_ordered)
+        })
+
+      })
+
+
+    }
 
     // await record.setUserId(data.userId || null, {
     //   transaction,
