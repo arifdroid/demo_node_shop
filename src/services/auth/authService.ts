@@ -115,7 +115,7 @@ class AuthService {
           transaction,
         );
 
-        return token;
+        return {token:token, user:existingUser};
       }
 
       const newUser = await UserRepository.createFromAuth(
@@ -165,7 +165,7 @@ class AuthService {
         transaction,
       );
 
-      return token;
+      return {token:token, user:newUser};
     } catch (error) {
       await SequelizeRepository.rollbackTransaction(
         transaction,
@@ -419,7 +419,7 @@ class AuthService {
         transaction,
       );
 
-      return token;
+      return {token:token, user:user};
     } catch (error) {
       await SequelizeRepository.rollbackTransaction(
         transaction,
