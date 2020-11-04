@@ -37,6 +37,8 @@ class OrdersRepository {
         ...lodash.pick(data, [
           
           'importHash',
+          'cod_location',
+          'cod_time'
         ]),
         tenantId: tenant.id,
         createdById: currentUser.id,
@@ -138,7 +140,9 @@ class OrdersRepository {
         ...lodash.pick(data, [
           
           'importHash',
-          'status'
+          'status',
+          'cod_location',
+          'cod_time'
         ]),
         updatedById: currentUser.id,
       },
@@ -514,6 +518,10 @@ class OrdersRepository {
     const transaction = SequelizeRepository.getTransaction(
       options,
     );
+
+     output.productId = await record.getProductId({
+      transaction,
+    });
 
     // output.orderId = await record.getOrderId({
     //   transaction,

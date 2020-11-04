@@ -23,6 +23,16 @@ export default function (sequelize) {
         type: DataTypes.STRING(255),
         allowNull: true,        
       },
+
+      cod_location: {
+        type: DataTypes.STRING(255),
+        allowNull: true,        
+      },
+
+      cod_time: {
+        type: DataTypes.STRING(255),
+        allowNull: true,        
+      },
     },
     {
       indexes: [
