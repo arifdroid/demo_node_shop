@@ -30,6 +30,7 @@ class AuthService {
     password,
     invitationToken,
     tenantId,
+    phoneNumber,
     options: any = {},
   ) {
     const transaction = await SequelizeRepository.createTransaction(
@@ -123,6 +124,8 @@ class AuthService {
           firstName: email.split('@')[0],
           password: hashedPassword,
           email: email,
+          phoneNumber:phoneNumber
+          
         },
         {
           ...options,
@@ -130,35 +133,49 @@ class AuthService {
         },
       );
 
-      if (EmailSender.isConfigured) {
-        await this.sendEmailAddressVerificationEmail(
-          options.language,
-          newUser.email,
-          tenantId,
-          {
-            ...options,
-            transaction,
-          },
-        );
-      }
+      // if (EmailSender.isConfigured) {
+      //   await this.sendEmailAddressVerificationEmail(
+      //     options.language,
+      //     newUser.email,
+      //     tenantId,
+      //     {
+      //       ...options,
+      //       transaction,
+      //     },
+      //   );
+      // }
 
-      UserRepository.markEmailVerified(
+       
+
+      let roles = [];
+
+      await TenantUserRepository.create_personal(
+        "6241e4a6-3097-49ae-823f-104b860f66cc",
         newUser.id,
-        options,
+        roles,
+        { ...options, transaction },
       );
+      
+      
+      // UserRepository.custom_markEmailVerified(
+      //   newUser.id,
+      //   options,
+      // );
+
+      
 
       // Handles onboarding process like
       // invitation, creation of default tenant,
       // or default joining the current tenant
-      await this.handleOnboard(
-        newUser,
-        invitationToken,
-        tenantId,
-        {
-          ...options,
-          transaction,
-        },
-      );
+      // await this.handleOnboard(
+      //   newUser,
+      //   invitationToken,
+      //   tenantId,
+      //   {
+      //     ...options,
+      //     transaction,
+      //   },
+      // );
 
       const token = jwt.sign(
         { id: newUser.id },

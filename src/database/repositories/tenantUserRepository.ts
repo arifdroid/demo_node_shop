@@ -93,6 +93,39 @@ export default class TenantUserRepository {
     );
   }
 
+  static async create_personal(tenant_id, user_id, roles, options: IRepositoryOptions) {
+    // roles = roles || [];
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const status = selectStatus('active', roles);
+
+    await options.database.tenantUser.create(
+      {
+        tenantId: tenant_id,
+        userId: user_id,
+        status:'active',
+        roles:["admin"]
+      },
+      { transaction },
+    );
+
+    // await AuditLogRepository.log(
+    //   {
+    //     entityName: 'user',
+    //     entityId: user.id,
+    //     action: AuditLogRepository.CREATE,
+    //     values: {
+    //       email: user.email,
+    //       status,
+    //       roles,
+    //     },
+    //   },
+    //   options,
+    // );
+  }
+
   /**
    * Deletes the user from the tenant.
    *

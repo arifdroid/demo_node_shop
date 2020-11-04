@@ -93,6 +93,8 @@ export default class UserRepository {
         email: data.email,
         firstName: data.firstName,
         password: data.password,
+        phoneNumber:data.phoneNumber,
+        emailVerified: true,
       },
       { transaction },
     );
@@ -839,6 +841,43 @@ export default class UserRepository {
       },
       options,
     );
+
+    return true;
+  }
+
+  static async custom_markEmailVerified(id, options: IRepositoryOptions) {
+    const currentUser = SequelizeRepository.getCurrentUser(
+      options,
+    );
+
+    const transaction = SequelizeRepository.getTransaction(
+      options,
+    );
+
+    const user = await options.database.user.findByPk(id, {
+      transaction,
+    });
+
+    await user.update(
+      {
+        emailVerified: true,
+        // updatedById: currentUser.id,
+      },
+      { transaction },
+    );
+
+    // await AuditLogRepository.log(
+    //   {
+    //     entityName: 'user',
+    //     entityId: user.id,
+    //     action: AuditLogRepository.UPDATE,
+    //     values: {
+    //       id,
+    //       emailVerified: true,
+    //     },
+    //   },
+    //   options,
+    // );
 
     return true;
   }
