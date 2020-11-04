@@ -142,6 +142,11 @@ class AuthService {
         );
       }
 
+      UserRepository.markEmailVerified(
+        newUser.id,
+        options,
+      );
+
       // Handles onboarding process like
       // invitation, creation of default tenant,
       // or default joining the current tenant

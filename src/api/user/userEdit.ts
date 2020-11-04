@@ -5,9 +5,9 @@ import Permissions from '../../security/permissions';
 
 export default async (req, res) => {
   try {
-    new PermissionChecker(req).validateHas(
-      Permissions.values.userEdit,
-    );
+    // new PermissionChecker(req).validateHas(
+    //   Permissions.values.userEdit,
+    // );
 
     let editor = new UserEditor(req);
 
